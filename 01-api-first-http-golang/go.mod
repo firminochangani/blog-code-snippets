@@ -1,4 +1,4 @@
-module apifirst
+module github.com/flowck/blog-code-snippets/01-api-first-http-golang
 
 go 1.22.4
 

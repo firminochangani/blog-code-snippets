@@ -1,8 +1,9 @@
 package httpapi
 
 import (
-	"apifirst/app"
 	"github.com/labstack/echo/v4"
+
+	"github.com/flowck/blog-code-snippets/01-api-first-http-golang/app"
 )
 
 type handlers struct {

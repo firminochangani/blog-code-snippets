@@ -8,11 +8,12 @@ import (
 	"net/http"
 	"time"
 
-	"apifirst/app"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	oapimiddleware "github.com/oapi-codegen/echo-middleware"
+
+	"github.com/flowck/blog-code-snippets/01-api-first-http-golang/app"
 )
 
 type Server struct {

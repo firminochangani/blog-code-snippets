@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"os"
 
-	"apifirst/app"
-	"apifirst/ports/httpapi"
+	"github.com/flowck/blog-code-snippets/01-api-first-http-golang/app"
+	"github.com/flowck/blog-code-snippets/01-api-first-http-golang/ports/httpapi"
 )
 
 func main() {
