@@ -1,0 +1,89 @@
+openapi: 3.0.3
+info:
+  title: todo-svc
+  description: TODO Service
+  termsOfService: https://github.com/flowck/blog-code-snippets/01-api-first-http-golang
+  contact:
+    email: firmino.changani@gmail.com
+  license:
+    name: MIT
+    url: https://github.com/flowck/blog-code-snippets/01-api-first-http-golang/LICENSE.md
+  version: 0.0.1
+externalDocs:
+  description: https://github.com/flowck/blog-code-snippets/01-api-first-http-golang/README.md
+  url: https://github.com/flowck/blog-code-snippets/01-api-first-http-golang
+servers:
+  - url: http://localhost:8080
+paths:
+  /tasks:
+    get:
+      tags:
+        - Task
+      operationId: getAllTasks
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllTasksPayload'
+        default:
+          $ref: '#/components/responses/DefaultError'
+    post:
+      tags:
+        - Task
+      operationId: createTask
+      responses:
+        '200':
+          description: CREATED
+        default:
+          $ref: '#/components/responses/DefaultError'
+components:
+  schemas:
+    GetAllTasksPayload:
+      required: [data]
+      properties:
+        data:
+          type: string
+          description: User's email address
+    # Task
+    Task:
+      required: [id, name, created_at, status]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        created_at:
+          type: string
+          # Formatting a string
+          format: data-time
+        status:
+          # Referencing another schema
+          $ref: '#/components/schemas/TaskStatus'
+    TaskStatus:
+      type: string
+      enum:
+        - todo
+        - in_progress
+        - blocked
+        - completed
+        - cancelled
+    # Default
+    ErrorResponse:
+      type: object
+      required: [ error, message ]
+      properties:
+        message:
+          type: string
+          description: A description about the error
+        error:
+          type: string
+          description: Error custom error code such as 'email_in_use'
+  responses:
+    DefaultError:
+      description: 'A generic error response'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
