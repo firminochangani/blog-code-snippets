@@ -11,10 +11,25 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/labstack/echo/v4"
 )
+
+// Defines values for TaskStatus.
+const (
+	Blocked    TaskStatus = "blocked"
+	Cancelled  TaskStatus = "cancelled"
+	Completed  TaskStatus = "completed"
+	InProgress TaskStatus = "in_progress"
+	Todo       TaskStatus = "todo"
+)
+
+// CreateTaskRequest defines model for CreateTaskRequest.
+type CreateTaskRequest struct {
+	Name string `json:"name"`
+}
 
 // ErrorResponse defines model for ErrorResponse.
 type ErrorResponse struct {
@@ -27,12 +42,25 @@ type ErrorResponse struct {
 
 // GetAllTasksPayload defines model for GetAllTasksPayload.
 type GetAllTasksPayload struct {
-	// Data User's email address
-	Data string `json:"data"`
+	Data []Task `json:"data"`
 }
+
+// Task defines model for Task.
+type Task struct {
+	CreatedAt time.Time  `json:"created_at"`
+	Id        string     `json:"id"`
+	Name      string     `json:"name"`
+	Status    TaskStatus `json:"status"`
+}
+
+// TaskStatus defines model for TaskStatus.
+type TaskStatus string
 
 // DefaultError defines model for DefaultError.
 type DefaultError = ErrorResponse
+
+// CreateTaskJSONRequestBody defines body for CreateTask for application/json ContentType.
+type CreateTaskJSONRequestBody = CreateTaskRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -103,17 +131,19 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/6xUwW7bMAz9FYMb0IsTueul8GlBEwzF1mVos1MRFIpM22plSRPpbkXgfx+kJG2DZNgl",
-	"N8mm3nuknt4alOu8s2iZoFxDQPLOEqbNFGvZG56F4ELcK2cZLcel9N5oJVk7Kx7J2fiNVIudjKuPAWso",
-	"4YN4AxebvyQS2u2WBoZhyKFCUkH7CAYlTLIGLQatMoylWXirzbccSd0+ULkGH5zHwHojHneq99HTqUz1",
-	"xK7bEihXYUa9ajNJ2Rl2UpsHbR96wjPIgV88QgnEQdsGhhw6JJINHkJPsnf7TK5czxm3uGE5RBpyCPir",
-	"1wErKO9hV7WDX74ecKtHVBypvyBPjFlIeqIf8sU4WR32XUmWh9p+EoYzylJzmayqgET/lZSglumK8A9j",
-	"sNJMnaJD9JbZUylEo7ntV2PlOlEb91s9iZVxzSgOeERWe49MojgfSa9HtQ7Eo3hy1DgjbSNuZ5PpzWzc",
-	"VZBDH8ypcOPgtK3dzsFSJQenUUAJtQ6dtm6sWmkbafXnJv6IXHBgzcV8Os/uMDxrhZCD0Qq33rOyi4O8",
-	"uV6cVrz4dn01+36XpjLkwBg6mtc7CaeaUA6s2UQ8dpUb0bOCHJ4x0KbtYlyMzyO982il11DCxbgYX0AO",
-	"XnKbDCE4ujKuGkzzjZ5M+XBdQfneuZDvp8ynojhZuBx5IEcSZv51c7Up3f4F+apR7MVgRGPZUHwfkQeW",
-	"Qw7e0ZGerwJKxlR0vOV9VVe3s8liNj2ptBSZGOJVQnm/fufMUgjjlDStIy4vi8sChuXwNwAA//+CVabN",
-	"DgYAAA==",
+	"H4sIAAAAAAAC/6xVTW/jNhD9K8K0wF5ky9u9LHSqGxtF0G5TJLktgoCmRhI3FMnljNIagf57MZTt2JGD",
+	"7sEnk9bwzZt58/EC2nfBO3RMUL5ARAreEabLCmvVW17H6KPctXeMjuWoQrBGKzbeFd/IO/mPdIudktPP",
+	"EWso4afiFbwYv1KR0G53bmAYhhwqJB1NEDAoYZk16DAanaGYZvHVNt/5SOyuIirGe0VPt/i9R0q8QvQB",
+	"I5sxAKc6lF/eBoQSiKNxTcKJ+L03ESsov45WD0MOp9QmaLjPwynf9CrTPbHvdpS1rzCjXreZouwDdsrY",
+	"R+Mee8IPkL9lk0OHRKrBKfQyO7pnauN7zrjF0csU6U1ce6s9/MPhgd98Q83i+nfkpbWSRPpbba1X1TTu",
+	"SnFS1TB29H/yCpQA7zypGNV2wiwhSsaT9cShTspWjypJWvvYyUle4YxNh+dyaKozQufvVUAOxIr7H4rm",
+	"brR8G4OpYAefHxM+IO/Duzs4Qtd38pJ95SEH4x5D9E1EIshhY71+QsEUGhZ5PCun0VqsjsQ7qD3kgP8y",
+	"Rqfsymualk/LHKgsisZw22/m2ndFbf0/+qnYWN/MpEpn5EwIyFQsPs5UMLPaROKZvJw13irXFLfr5erL",
+	"et4Jnz7aS+Em0Vzt94NF6aR2ahYooTaxM87Pdatco5z5tZEP4gsmE+P+ZnWT3WF8NlrUsEbjroFH+eHL",
+	"9f1lyRd/Xl+t/7pLWZFix9jRTb2ncKkM5cCGreBJyczoWUMOzxhpDHsxX8w/insf0KlgoIRP88X8E+QQ",
+	"FLepIAqW1pZTgym/0mdpbF9XUB63P+Snw/+XxeJiM//MlDkz+G/+GKVNS+c9yAPH4mQ7CRqrhqS/0lCR",
+	"9guezsT8ujdg7Ggk/s1X24tFO11Mw+nw4NjjcD7dpxm5ul0v79eri6YlbVGMUkZQfn056oqyKKzXyrae",
+	"uPy8+LyA4WH4LwAA//+3QC9AIQgAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

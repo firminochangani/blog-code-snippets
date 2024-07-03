@@ -2,14 +2,7 @@ package app
 
 import (
 	"sync"
-	"time"
 )
-
-type Task struct {
-	name      string
-	status    string
-	createdAt time.Time
-}
 
 type App struct {
 	lock *sync.RWMutex
@@ -38,7 +31,7 @@ func (s *App) GetAllTasks() ([]Task, error) {
 	return result, nil
 }
 
-func (s *App) CreateTask(name string) error {
+func (s *App) CreateTask(name, ownerId string) error {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 

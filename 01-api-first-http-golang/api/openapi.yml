@@ -33,6 +33,12 @@ paths:
       tags:
         - Task
       operationId: createTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
       responses:
         '200':
           description: CREATED
@@ -44,9 +50,15 @@ components:
       required: [data]
       properties:
         data:
-          type: string
-          description: User's email address
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
     # Task
+    CreateTaskRequest:
+      required: [name]
+      properties:
+        name:
+          type: string
     Task:
       required: [id, name, created_at, status]
       properties:
@@ -56,8 +68,8 @@ components:
           type: string
         created_at:
           type: string
+          format: date-time
           # Formatting a string
-          format: data-time
         status:
           # Referencing another schema
           $ref: '#/components/schemas/TaskStatus'
